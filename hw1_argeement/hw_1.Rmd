@@ -1,0 +1,113 @@
+---
+title: "hw1"
+output: 
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r, include=FALSE}
+library(tidyverse)
+library(irr)
+```
+### 1.1
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw1_agreement/hw1_1_zilo_class.csv")
+
+df %>% 
+  distinct(stimulus_source, translation_ru) %>% 
+  count(stimulus_source)
+```
+### 1.2
+```{r}
+df %>% 
+  select(s_id, stimulus, translation_ru, stimulus_source, class) %>% 
+  spread(key = s_id, value = class) ->
+  zilo_classes_short
+head(zilo_classes_short)
+```
+```{r}
+agree(zilo_classes_short[,-c(1:3)])
+```
+```{r}
+round(75.3*89/100)
+```
+### 1.3
+```{r}
+zilo_classes_short[,c(7, 11)] %>% 
+kappa2()
+```
+
+### 1.4
+```{r}
+zilo_classes_short[,-c(1:3)] %>% 
+kappam.fleiss()
+```
+
+### 1.5
+####В датасете 42 заимствованных, 47 исконных слова. При определении рода, в 67 (из 89) случаях информанты дали одинаковые ответы. 
+#### Мера согласованности (Каппа Коэна) для 7 и 11 информантов составила 73%. Для всех информантов (Каппа Фляйса) - 84.4%
+
+### 2.1
+```{r}
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw1_agreement/hw1_2_verbs.csv")
+
+df %>% 
+  distinct(SubjectCode) %>% 
+  count()
+```
+### 2.2
+```{r}
+df %>% 
+  select(Gender, WordType, GivenScore) %>% 
+  group_by(Gender, WordType) %>% 
+  summarise(mean = mean(GivenScore))
+```
+### 2.3
+```{r}
+df %>% 
+  select(SubjectCode, Stimulus, GivenScore) %>% 
+  drop_na() %>%
+  spread(key = Stimulus, value = GivenScore) ->
+  verbs_short
+head(verbs_short)
+```
+```{r}
+agree(verbs_short[,-c(1)])
+```
+### 2.4
+```{r}
+verbs_short[,-1] %>% 
+kappam.fleiss()
+```
+
+### 2.5
+```{r}
+icc(verbs_short[,-1], model = "twoway", type = "agreement")
+```
+### 2.6
+```{r}
+verbs_short[, -1] %>% 
+  t() %>% 
+  data.frame()-> 
+  t_verbs_short
+```
+
+```{r}
+data.frame(cor(t_verbs_short, method = "kendall")) ->
+  df_verbs
+
+min = min(df_verbs)
+
+for(i in c(1:89)){
+  df_verbs[i,i]=0
+  }
+
+max = max(df_verbs)
+
+data.frame(min=min, max=max)
+```
