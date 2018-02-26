@@ -1,0 +1,65 @@
+---
+title: "hw_2"
+author: "Maria Terekhina"
+output: 
+  html_document:
+    df_print: paged
+---
+```{r, include=FALSE}
+library(tidyverse)
+library(mosaic)
+```
+### 1.1
+```{r}
+binomial_test <- binom.test(x = 51, n = 158, p = 0.39385726529621534)
+binomial_test
+```
+### 1.2
+```{r}
+set.seed(42)
+do(1000)*
+  sum(sample(x = 1:0, 
+             size = 158, 
+             prob = c(0.39385726529621534, 1-0.39385726529621534),
+             replace = TRUE)) ->
+  simulations
+simulations %>% 
+  mutate(greater = sum >= 51) %>% 
+  count(greater)
+```
+### 1.3
+```{r}
+alpha_prior <- 0.39385726529621534*158
+alpha_prior
+```
+```{r}
+beta_prior <- (1-0.39385726529621534)*158
+beta_prior
+```
+```{r}
+alpha_data <- 51
+beta_data <- 107
+
+alpha_post <- alpha_prior + alpha_data
+beta_post <- beta_prior + beta_data
+
+alpha_post/(alpha_post+beta_post)
+```
+### 1.4
+```{r}
+alpha_data <- 51
+beta_data <- 107
+
+alpha_post <- 1 + alpha_data
+beta_post <- 1 + beta_data
+
+alpha_post/(alpha_post+beta_post)
+```
+### 1.5
+```
+По результатам биномиального теста мы не можем отвернуть нулевую гипотезу о том, что наша веротяность успеха = 0.3938573 ( p-value = 0.07317).
+
+Симуляция показала, что при наших данных веротяность получить 51 и более успехов = 0.973.
+
+Используя имеющиеся данные для рассчета априорного распределения мы получили апостериорное среднее =  0.358321. При использовании неинформативного априорного распределения апострериорное среднее = 0.325
+```
