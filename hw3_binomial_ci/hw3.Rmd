@@ -1,0 +1,108 @@
+---
+title: "hw3"
+author: "Maria Terekhina"
+output: 
+  html_document:
+    df_print: paged
+---
+
+```{r, include=FALSE}
+install.packages('bootstrap')
+library(tidyverse)
+library(bootstrap)
+library(mosaic)
+```
+
+### 1.1
+```{r}
+data <-read_csv('https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw3_binomial_ci/hw3_wodehouse.csv')
+```
+```{r}
+data %>% 
+  select(chapter, word) %>% 
+  group_by(chapter) %>% 
+  count(chapter) -> data_new
+
+data %>% 
+  filter(word == "сэр") %>% 
+  select(chapter, word) %>% 
+  group_by(chapter) %>% 
+  count() -> data_count
+
+data_new$сэр <- data_count$n
+
+data_new %>% 
+  mutate(average = сэр/n) -> data_new
+
+data_new
+```
+```{r}  
+mean(data_new$average) -> grand_mean
+tibble(grand_mean)
+```
+### 1.2
+```{r}  
+data_bs <- bootstrap(data_new$average, nboot = 10000, theta = mean)$thetastar
+
+tibble(mean = mean(data_bs),
+       q1 = quantile(data_bs, 0.025),
+       q2 = quantile(data_bs, 0.975))->
+  data_stats
+data_stats
+```
+### 1.3
+```{r}  
+data_new %>% 
+  mutate(low_ci = binom.test(x = сэр, n = n, ci.method = "Clopper-Pearson")$conf.int[1],
+         up_ci = binom.test(x = сэр, n = n, ci.method = "Clopper-Pearson")$conf.int[2]) %>% 
+  mutate(ci = up_ci-low_ci) -> data_ci
+
+tibble(chapter = data_ci$chapter[data_ci$ci == max(data_ci$ci)], ci = data_ci$ci[data_ci$ci == max(data_ci$ci)])
+```
+### 1.4
+```{r}  
+mu <- grand_mean
+var <- var(data_new$average)
+alpha0 <- ((1 - mu) / var - 1 / mu) * mu ^ 2
+beta0 <- alpha0 * (1 / mu - 1)
+tibble(alpha0, beta0)
+```
+```{r}  
+data_new %>% 
+  mutate(alpha_post = сэр+alpha0,
+         beta_post = n-сэр+beta0,
+         average_post = alpha_post/(alpha_post+beta_post),
+         cred_int_l = qbeta(.025, alpha_post, beta_post),
+         cred_int_h = qbeta(.975, alpha_post, beta_post)) %>% 
+  mutate(ci = cred_int_h - cred_int_l) ->
+  posterior
+tibble(chapter = posterior$chapter[posterior$ci == max(posterior$ci)], ci = posterior$ci[posterior$ci == max(posterior$ci)])
+```
+### 1.5
+```{r}  
+data_new %>% 
+  mutate(low_ci = binom.test(x = сэр, n = n, ci.method = "Clopper-Pearson")$conf.int[1],
+         up_ci = binom.test(x = сэр, n = n, ci.method = "Clopper-Pearson")$conf.int[2]) %>% 
+  mutate(ci = up_ci-low_ci) -> data_ci
+
+tibble(chapter = data_ci$chapter[data_ci$ci == min(data_ci$ci)], ci = data_ci$ci[data_ci$ci == min(data_ci$ci)])
+```
+### 1.6
+```{r}
+data_new %>% 
+  mutate(alpha_post = сэр+alpha0,
+         beta_post = n-сэр+beta0,
+         average_post = alpha_post/(alpha_post+beta_post),
+         cred_int_l = qbeta(.025, alpha_post, beta_post),
+         cred_int_h = qbeta(.975, alpha_post, beta_post)) %>% 
+  mutate(ci = cred_int_h - cred_int_l) ->
+  posterior
+
+tibble(chapter = posterior$chapter[posterior$ci == min(posterior$ci)], ci = posterior$ci[posterior$ci == min(posterior$ci)])
+```
+### 1.7
+```
+Разница в оценках обычного среднего и стреднего после bootstrap есть, но ооочень маленькая, разлицие в стотысячных долях. Если смотреть среднее по главам, сильно выбивается Глава 6, в которой всего 1 'сэр'. 
+
+Главы с минимальным и максимльным доверительным интервалом получились одни и те же для фриквентистского и баесовского подхода, доверительный интервал отличается и в случае максимума и в случае минимума на тысячные доли.
+```
