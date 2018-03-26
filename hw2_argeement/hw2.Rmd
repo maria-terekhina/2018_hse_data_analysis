@@ -1,5 +1,5 @@
 ---
-title: "hw1"
+title: "hw2"
 output: 
   html_document:
     df_print: paged
@@ -16,7 +16,7 @@ library(irr)
 ```
 ### 1.1
 ```{r}
-df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw1_agreement/hw1_1_zilo_class.csv")
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw2_agreement/hw2_1_zilo_class.csv")
 
 df %>% 
   distinct(stimulus_source, translation_ru) %>% 
@@ -54,7 +54,7 @@ kappam.fleiss()
 
 ### 2.1
 ```{r}
-df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw1_agreement/hw1_2_verbs.csv")
+df <- read_csv("https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw2_agreement/hw2_2_verbs.csv")
 
 df %>% 
   distinct(SubjectCode) %>% 
