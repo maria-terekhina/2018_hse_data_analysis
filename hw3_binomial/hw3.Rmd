@@ -1,5 +1,5 @@
 ---
-title: "hw_3"
+title: "hw3"
 author: "Maria Terekhina"
 output: 
   html_document:
