@@ -15,7 +15,7 @@ library(mosaic)
 
 ### 1.1
 ```{r}
-data <-read_csv('https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw3_binomial_ci/hw3_wodehouse.csv')
+data <-read_csv('https://raw.githubusercontent.com/agricolamz/2018_data_analysis_for_linguists/master/data/students/maria-terekhina/hw4_binomial_ci/hw4_wodehouse.csv')
 ```
 ```{r}
 data %>% 
